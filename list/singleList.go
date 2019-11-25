@@ -19,7 +19,8 @@ func NewSingleList() *SingleList{
 	return new(SingleList)
 }
 
-func (list *SingleList) BeforeInert(item interface{})  {
+//头部插入
+func (list *SingleList) HeadInsert(item interface{})  {
 	node := &Node{Item:item}
 	if list.Root == nil {
 		 list.Root = node
@@ -30,6 +31,7 @@ func (list *SingleList) BeforeInert(item interface{})  {
 	list.Len++
 }
 
+//中间插入
 func (list *SingleList) MidInsert(item interface{},index int)  {
 	node := &Node{Item:item}
 	sp := list.Root
@@ -46,7 +48,8 @@ func (list *SingleList) MidInsert(item interface{},index int)  {
 	list.Len++
 }
 
-func (list *SingleList) AfterInsert(item interface{})  {
+//尾部插入
+func (list *SingleList) TailInsert(item interface{})  {
 	node := &Node{Item:item}
 	if list.Root == nil {
 		list.Root = node
@@ -60,6 +63,7 @@ func (list *SingleList) AfterInsert(item interface{})  {
 	list.Len++
 }
 
+//头部删除元素
 func (list *SingleList) HeadDelete() interface{} {
 	if list.Root == nil {
 		return nil
@@ -70,6 +74,7 @@ func (list *SingleList) HeadDelete() interface{} {
 	return item
 }
 
+//尾部删除元素
 func (list *SingleList) TailDelete() interface{} {
 	if list.Root == nil {
 		return nil
@@ -89,6 +94,7 @@ func (list *SingleList) TailDelete() interface{} {
 	return item
 }
 
+//中间删除元素
 func (list *SingleList) MidDelete(index int) interface{} {
 	if list.Root == nil {
 		return nil
@@ -102,6 +108,7 @@ func (list *SingleList) MidDelete(index int) interface{} {
 	return item
 }
 
+//有序插入
 func (list *SingleList) SortedInsert(item interface{})  {
 	if list.Root == nil {
 		list.Root = &Node{Item:item}
@@ -109,7 +116,7 @@ func (list *SingleList) SortedInsert(item interface{})  {
 	} else {
 		//如果插入的元素比头部元素小，直接插入头部
 		if list.Root.Item.(int) >= item.(int) {
-			list.BeforeInert(item)
+			list.HeadInsert(item)
 		} else {
 			//从中部i位置插入
 			sp := list.Root
@@ -126,6 +133,24 @@ func (list *SingleList) SortedInsert(item interface{})  {
 	}
 }
 
+//反转链表
+func (list *SingleList) ReverseSingleList() {
+	if list.Root == nil {
+		return
+	}
+	prev := list.Root
+	sp := list.Root.Next
+	prev.Next = nil
+	for sp != nil {
+		node := sp.Next
+		sp.Next = prev
+		prev = sp
+		sp = node
+	}
+	list.Root = prev
+}
+
+//输出链表
 func (list *SingleList) Print()  {
 	sp := list.Root
 	for sp != nil {
