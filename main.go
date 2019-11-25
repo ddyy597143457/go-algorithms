@@ -1,15 +1,12 @@
 package main
 
 import (
-	"ddyy/go-algorithms/list"
+	"ddyy/go-algorithms/sorting"
+	"fmt"
 )
 
 func main() {
-	l := list.NewSingleList()
-	for i:=1;i<=10;i++ {
-		l.TailInsert(i)
-	}
-	l.Print()
-	l.ReverseSingleList()
-	l.Print()
+	arr := []int{8,6,9,7,1,5,4,3,2}
+	sorting.ShellSort(arr)
+	fmt.Println(arr)
 }
