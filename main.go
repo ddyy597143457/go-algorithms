@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	arr := []int{8,6,9,7,1,10,5,4,3,2}
-	sorting.HeadSort(arr)
+	arr := []int{29,25,1,49,9,37,21,43,17,14}
+	sorting.RadixSort(arr)
 	fmt.Println(arr)
 }
