@@ -14,8 +14,8 @@ func CountingSort(arr []int)  {
 		bucket[arr[i]] += 1	//数组的值填充bucket的key
 	}
 	for j:=0;j<bucketlen;j++ {
-		//bucket[j] > 0则说明有值，输出
-		if bucket[j] > 0 {
+		//bucket[j] > 0，有值，for是因为可能有些值是重复的
+		for bucket[j] > 0 {
 			arr[startIndex] = j
 			startIndex++
 			bucket[j] -= 1
