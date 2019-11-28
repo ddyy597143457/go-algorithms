@@ -1,5 +1,6 @@
 package searching
 
+//二分查找
 func BinarySearch(arr []int,searchValue int) int {
 	left := 0
 	right := len(arr) - 1

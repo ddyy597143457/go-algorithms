@@ -1,10 +1,11 @@
 /**
 二叉树
  */
-package binaryTree
+package tree
 
 import "fmt"
 
+//节点值比较函数
 type Comparable func(c1 interface{},c2 interface{}) bool
 
 type BinaryTree struct {
@@ -20,6 +21,7 @@ func New(comparafunc Comparable) *BinaryTree{
 	}
 }
 
+//插入元素
 func (binarytree *BinaryTree) Insert(item interface{})  {
 	if binarytree.Node == nil {
 		binarytree.Node = item
@@ -34,6 +36,7 @@ func (binarytree *BinaryTree) Insert(item interface{})  {
 	}
 }
 
+//查找元素
 func (binarytree *BinaryTree) Search(item interface{}) *BinaryTree{
 	if binarytree.Node == nil {
 		return nil
@@ -48,6 +51,7 @@ func (binarytree *BinaryTree) Search(item interface{}) *BinaryTree{
 	}
 }
 
+//二叉树最大值，也就是最右子节点值
 func (binarytree *BinaryTree) Max() interface{} {
 	if binarytree.Node == nil || binarytree.Right.Node == nil{
 		return binarytree.Node
@@ -55,6 +59,7 @@ func (binarytree *BinaryTree) Max() interface{} {
 	return binarytree.Right.Max()
 }
 
+//二叉树最小值，也就是最左子节点
 func (binarytree *BinaryTree) Min() interface{} {
 	if binarytree.Node == nil || binarytree.Left.Node == nil{
 		return binarytree.Node
