@@ -17,3 +17,29 @@ func TestStack(t *testing.T) {
 		}
 	}
 }
+
+func TestIsBalanceParentHesis(t *testing.T) {
+	str := "{[(4,4,4)]}"
+	res := IsBalanceParentHesis(str)
+	if !res {
+		t.Error("TestIsBalanceParentHesis failed...")
+	}
+	str = "{[(()]}"
+	res = IsBalanceParentHesis(str)
+	if res {
+		t.Error("TestIsBalanceParentHesis failed...")
+	}
+}
+
+func TestInfixToPostfix(t *testing.T) {
+	expn := "(1+3)*4"
+	value := InfixToPostfix(expn)
+	if value != "1 3 + 4 *" {
+		t.Error("TestInfixToPostfix failed...")
+	}
+	expn = "10+((3))*5/(16-4)"
+	value = InfixToPostfix(expn)
+	if value != "10 3 5 16 4 - / * +" {
+		t.Error("TestInfixToPostfix failed...")
+	}
+}
