@@ -1,13 +1,19 @@
 package main
 
-import (
-	"ddyy/go-algorithms/stack"
-	"fmt"
-)
+import "ddyy/go-algorithms/list"
+
+func LessIntFunc(c1,c2 interface{}) bool {
+	return c1.(int) < c2.(int)
+}
 
 func main() {
-	expn := "(3+4)*5"
-	value := stack.InfixToPostfix(expn)
-	fmt.Println(expn)
-	fmt.Println(value)
+	l := list.NewDoubleList(LessIntFunc)
+	for i:=1;i<=10;i++ {
+		l.LRUVisit(i)
+	}
+	l.LRUVisit(11)
+	l.LRUVisit(12)
+	l.LRUVisit(9)
+	l.HeadPrint()
+	l.TailPrint()
 }
