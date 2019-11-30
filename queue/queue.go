@@ -20,6 +20,10 @@ func New() *Queue {
 	return new(Queue)
 }
 
+func (queue *Queue)IsEmpty() bool {
+	return queue.Depth == 0
+}
+
 func (queue *Queue)EnQueue(item interface{})  {
 	q := &QueueItem{Item:item}
 	if queue.Depth == 0 {

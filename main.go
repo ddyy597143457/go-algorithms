@@ -1,19 +1,18 @@
 package main
 
-import "ddyy/go-algorithms/list"
+import (
+	"ddyy/go-algorithms/tree"
+	"fmt"
+)
 
 func LessIntFunc(c1,c2 interface{}) bool {
 	return c1.(int) < c2.(int)
 }
 
 func main() {
-	l := list.NewDoubleList(LessIntFunc)
-	for i:=1;i<=10;i++ {
-		l.LRUVisit(i)
-	}
-	l.LRUVisit(11)
-	l.LRUVisit(12)
-	l.LRUVisit(9)
-	l.HeadPrint()
-	l.TailPrint()
+	arr := []int{4,5,6,7,8,9,10,11}
+	tree1 := tree.LevelOrderBinaryTree(arr)
+	tree1.PreOrder()
+	fmt.Println()
+	tree1.PrintAllPath()
 }

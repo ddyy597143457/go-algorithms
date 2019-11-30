@@ -1,112 +1,230 @@
-/**
-二叉树
- */
 package tree
 
-import "fmt"
+import (
+	"ddyy/go-algorithms/queue"
+	stack2 "ddyy/go-algorithms/stack"
+	"fmt"
+)
 
-//节点值比较函数
-type Comparable func(c1 interface{},c2 interface{}) bool
+type treeNode struct {
+	item interface{}
+	left,right *treeNode
+}
 
 type BinaryTree struct {
-	Node interface{}
-	Left *BinaryTree
-	Right *BinaryTree
-	LessFunc Comparable
+	root *treeNode
 }
 
-func New(comparafunc Comparable) *BinaryTree{
-	return &BinaryTree{
-		LessFunc:comparafunc,
+func LevelOrderBinaryTree(arr []int) *BinaryTree {
+	tree := new(BinaryTree)
+	tree.root = levelOrderBinaryTree(arr,0,len(arr))
+	return tree
+}
+
+func levelOrderBinaryTree(arr []int,start int, size int) *treeNode {
+	curr := &treeNode{item:arr[start]}
+	//这里为什么还要加1呢，因为是数组下标从0开始，而书面上的公式都是按1-n编码算的
+	left := start*2 + 1
+	right := start*2+1 + 1
+	if left < size {
+		curr.left = levelOrderBinaryTree(arr,left,size)
 	}
+	if right < size {
+		curr.right = levelOrderBinaryTree(arr,right,size)
+	}
+	return curr
 }
 
-//插入元素
-func (binarytree *BinaryTree) Insert(item interface{})  {
-	if binarytree.Node == nil {
-		binarytree.Node = item
-		binarytree.Left = New(binarytree.LessFunc)
-		binarytree.Right = New(binarytree.LessFunc)
+func (tree *BinaryTree)PreOrder() {
+	preOrder(tree.root)
+}
+
+func preOrder(node *treeNode)  {
+	if node == nil {
 		return
 	}
-	if binarytree.LessFunc(item,binarytree.Node) {
-		binarytree.Left.Insert(item)
-	} else {
-		binarytree.Right.Insert(item)
+	fmt.Print(node.item," ")
+	preOrder(node.left)
+	preOrder(node.right)
+}
+
+func (tree *BinaryTree)MidOrder() {
+	midOrder(tree.root)
+}
+
+func midOrder(node *treeNode)  {
+	if node == nil {
+		return
+	}
+	midOrder(node.left)
+	fmt.Print(node.item," ")
+	midOrder(node.right)
+}
+
+func (tree *BinaryTree)PostOrder() {
+	postOrder(tree.root)
+}
+
+func postOrder(node *treeNode)  {
+	if node == nil {
+		return
+	}
+	postOrder(node.left)
+	postOrder(node.right)
+	fmt.Print(node.item," ")
+}
+
+//层次遍历（宽度优先）（利用slice实现）
+func (tree *BinaryTree) LevelTravel() {
+	if tree.root == nil {
+		return
+	}
+	queue := make([]*treeNode,0)
+	queue = append(queue,tree.root)
+	for len(queue) > 0 {
+		it := queue[0]
+		fmt.Print(it.item," ")
+		queue = queue[1:]
+		if it.left != nil {
+			queue = append(queue,it.left)
+		}
+		if it.right != nil {
+			queue = append(queue,it.right)
+		}
 	}
 }
 
-//查找元素
-func (binarytree *BinaryTree) Search(item interface{}) *BinaryTree{
-	if binarytree.Node == nil {
+//层次遍历（宽度优先）（利用队列实现）
+func (tree *BinaryTree) LevelTravel1() {
+	if tree.root == nil {
+		return
+	}
+	q := queue.New()
+	q.EnQueue(tree.root)
+	for !q.IsEmpty() {
+		it,_ := (q.DeQueue()).(*treeNode)
+		fmt.Print(it.item," ")
+		if it.left != nil {
+			q.EnQueue(it.left)
+		}
+		if it.right != nil {
+			q.EnQueue(it.right)
+		}
+	}
+}
+
+//计算树的深度
+func (tree *BinaryTree)TreeDepth() int {
+	return treeDepth(tree.root)
+}
+func treeDepth(n *treeNode) int {
+	if n == nil {
+		return 0
+	}
+	leftDepth := treeDepth(n.left) + 1
+	rightDepth := treeDepth(n.right) + 1
+	if leftDepth > rightDepth {
+		return leftDepth
+	}
+	return rightDepth
+}
+
+//复制树
+func (tree *BinaryTree)CopyTree() *BinaryTree{
+	tree2 := new(BinaryTree)
+	tree2.root = copyTree(tree.root)
+	return tree2
+}
+
+func copyTree(n *treeNode) *treeNode {
+	if n == nil {
 		return nil
 	}
-	if binarytree.Node == item {
-		return binarytree
+	temp := new(treeNode)
+	temp.item = n.item
+	temp.left = copyTree(n.left)
+	temp.right = copyTree(n.right)
+	return temp
+}
+
+//复制树镜像
+func (tree *BinaryTree)CopyMirrorTree() *BinaryTree{
+	tree2 := new(BinaryTree)
+	tree2.root = copyMirrorTree(tree.root)
+	return tree2
+}
+
+func copyMirrorTree(n *treeNode) *treeNode {
+	if n == nil {
+		return nil
 	}
-	if binarytree.LessFunc(item,binarytree.Node) {
-		return binarytree.Left.Search(item)
+	temp := new(treeNode)
+	temp.item = n.item
+	temp.right = copyTree(n.left)
+	temp.left = copyTree(n.right)
+	return temp
+}
+
+//树的节点数量
+func (tree *BinaryTree)NumNodes() int {
+	return numNodes(tree.root)
+}
+
+func numNodes(n *treeNode) int {
+	if n == nil {
+		return 0
+	}
+	return 1+numNodes(n.left)+numNodes(n.right)
+}
+
+//树的叶子节点数量
+func (tree *BinaryTree)NumLeafNodes() int {
+	return numLeafNodes(tree.root)
+}
+
+func numLeafNodes(n *treeNode) int {
+	if n == nil {
+		return 0
+	}
+	if n.left == nil && n.right == nil {
+		return 1
+	}
+	return numLeafNodes(n.left)+numLeafNodes(n.right)
+}
+
+//判断两棵树是否相等
+func IsEqual(tree,tree2 *BinaryTree) bool {
+	return isEqual(tree.root,tree2.root)
+}
+
+func isEqual(n,n2 *treeNode) bool {
+	if n == nil && n2 == nil {
+		return true
+	}else if n == nil || n2 == nil {
+		return false
 	} else {
-		return binarytree.Right.Search(item)
+		return (n.item == n2.item) && isEqual(n.left,n2.left) && isEqual(n.right,n2.right)
 	}
 }
 
-//二叉树最大值，也就是最右子节点值
-func (binarytree *BinaryTree) Max() interface{} {
-	if binarytree.Node == nil || binarytree.Right.Node == nil{
-		return binarytree.Node
-	}
-	return binarytree.Right.Max()
+//输出所有路径
+func (tree *BinaryTree)PrintAllPath()  {
+	stack := new(stack2.Stack)
+	printAllPath(tree.root,stack)
 }
-
-//二叉树最小值，也就是最左子节点
-func (binarytree *BinaryTree) Min() interface{} {
-	if binarytree.Node == nil || binarytree.Left.Node == nil{
-		return binarytree.Node
+func printAllPath(n *treeNode,stack *stack2.Stack) {
+	if n == nil {
+		return
 	}
-	return binarytree.Left.Min()
-}
-
-//前序遍历
-func (binarytree *BinaryTree) PreTravel()  {
-	if binarytree.Node != nil {
-		fmt.Println(binarytree.Node)
-		binarytree.Left.PreTravel()
-		binarytree.Right.PreTravel()
+	stack.Push(n.item)
+	if n.left == nil && n.right == nil {
+		stack.Print()
+		stack.Pop()
+		fmt.Println()
+		return
 	}
-}
-
-//中序遍历
-func (binarytree *BinaryTree) MidTravel()  {
-	if binarytree.Node != nil {
-		binarytree.Left.MidTravel()
-		fmt.Println(binarytree.Node)
-		binarytree.Right.MidTravel()
-	}
-}
-
-//后序遍历
-func (binarytree *BinaryTree) PostOrderTravel()  {
-	if binarytree.Node != nil {
-		binarytree.Left.PostOrderTravel()
-		binarytree.Right.PostOrderTravel()
-		fmt.Println(binarytree.Node)
-	}
-}
-
-//层次遍历
-func (binarytree *BinaryTree) LevelTravel() {
-	queue := make([]*BinaryTree,0)
-	queue = append(queue,binarytree)
-	for len(queue) > 0 {
-		item := queue[0]
-		fmt.Println(item.Node)
-		queue = queue[1:]
-		if item.Left.Node != nil {
-			queue = append(queue,item.Left)
-		}
-		if item.Right.Node != nil {
-			queue = append(queue,item.Right)
-		}
-	}
+	printAllPath(n.left,stack)
+	printAllPath(n.right,stack)
+	//这个pop有点讲究
+	stack.Pop()
 }

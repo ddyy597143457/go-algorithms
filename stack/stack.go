@@ -49,7 +49,7 @@ func (s *Stack) Peek() interface{} {
 func (s *Stack) Print() {
 	sp := s.Sp
 	for sp != nil {
-		fmt.Println(sp.Item)
+		fmt.Print(sp.Item," ")
 		sp = sp.Next
 	}
 }
