@@ -393,3 +393,48 @@ func isBST(curr *treeNode) bool {
 	}
 	return isBST(curr.left) && isBST(curr.right)
 }
+
+func (tree *BinaryTree)DeleteNode(value int)  {
+	tree.root = deleteNode(tree.root,value)
+}
+func deleteNode(curr *treeNode,value int) *treeNode {
+	 if curr == nil {
+	 	return nil
+	 }
+	 if curr.item == value {
+	 	//目标删除节点是当前节点
+	 	if curr.left == nil && curr.right == nil {
+	 		//如果当前节点没有子节点了，删除自己，返回nil
+	 		return nil
+		}
+	 	if curr.left == nil {
+	 		//如果左子树是nil，右子树直接顶上
+	 		return curr.right
+
+		} else if curr.right == nil {
+			//如果右子树是nil，左子树直接顶上
+			return curr.left
+		}
+	 	lefttreedepth := treeDepth(curr.left)
+	 	righttreedepth := treeDepth(curr.right)
+	 	var t interface{}
+	 	if lefttreedepth > righttreedepth {
+	 		//如果左子树比较长，则从左子树选出一个最大的节点代替当前节点，然后删除那个最大节点
+			t,_ = FindMax(curr.left)
+			curr.item = t
+			curr.left = deleteNode(curr.left,t.(int))
+		} else {
+			//如果右子树比较长，则从右子树选出一个最小的节点代替当前节点，然后删除那个最小节点
+			t,_  = FindMin(curr.right)
+			curr.item = t
+			curr.right = deleteNode(curr.right,t.(int))
+		}
+	 } else if curr.item.(int) > value{
+	 	//目标删除节点在左子树
+	 	curr.left = deleteNode(curr.left,value)
+	 } else {
+	 	//目标删除节点在右子树
+	 	curr.right = deleteNode(curr.right,value)
+	 }
+	 return curr
+}
