@@ -4,6 +4,7 @@ import (
 	"ddyy/go-algorithms/queue"
 	stack2 "ddyy/go-algorithms/stack"
 	"fmt"
+	"math"
 )
 
 type treeNode struct {
@@ -15,22 +16,22 @@ type BinaryTree struct {
 	root *treeNode
 }
 
-func LevelOrderBinaryTree(arr []int) *BinaryTree {
+func LevelCreateBinaryTree(arr []int) *BinaryTree {
 	tree := new(BinaryTree)
-	tree.root = levelOrderBinaryTree(arr,0,len(arr))
+	tree.root = levelCreateBinaryTree(arr,0,len(arr))
 	return tree
 }
 
-func levelOrderBinaryTree(arr []int,start int, size int) *treeNode {
+func levelCreateBinaryTree(arr []int,start int, size int) *treeNode {
 	curr := &treeNode{item:arr[start]}
 	//这里为什么还要加1呢，因为是数组下标从0开始，而书面上的公式都是按1-n编码算的
 	left := start*2 + 1
 	right := start*2+1 + 1
 	if left < size {
-		curr.left = levelOrderBinaryTree(arr,left,size)
+		curr.left = levelCreateBinaryTree(arr,left,size)
 	}
 	if right < size {
-		curr.right = levelOrderBinaryTree(arr,right,size)
+		curr.right = levelCreateBinaryTree(arr,right,size)
 	}
 	return curr
 }
@@ -207,6 +208,31 @@ func isEqual(n,n2 *treeNode) bool {
 	}
 }
 
+//输出最长路径
+func (tree *BinaryTree)PrintMaxPath()  {
+	stack := new(stack2.Stack)
+	depth := tree.TreeDepth()
+	printMaxPath(tree.root,stack,depth)
+}
+func printMaxPath(n *treeNode,stack *stack2.Stack,depth int) {
+	if n == nil {
+		return
+	}
+	stack.Push(n.item)
+	if n.left == nil && n.right == nil {
+		if stack.Depth == depth {
+			stack.Print()
+			fmt.Println()
+		}
+		stack.Pop()
+		return
+	}
+	printMaxPath(n.left,stack,depth)
+	printMaxPath(n.right,stack,depth)
+	stack.Pop()
+}
+
+
 //输出所有路径
 func (tree *BinaryTree)PrintAllPath()  {
 	stack := new(stack2.Stack)
@@ -225,6 +251,145 @@ func printAllPath(n *treeNode,stack *stack2.Stack) {
 	}
 	printAllPath(n.left,stack)
 	printAllPath(n.right,stack)
-	//这个pop有点讲究
 	stack.Pop()
+}
+
+
+//最近公共祖先
+func (tree *BinaryTree)LCA(first,second int) *treeNode{
+	return lca(tree.root,first,second)
+
+}
+func lca(curr *treeNode,first,second int) *treeNode{
+	if curr == nil {
+		return nil
+	}
+	if curr.item == first || curr.item == second {
+		return curr
+	}
+	left := lca(curr.left,first,second)
+	right := lca(curr.right,first,second)
+	if left != nil && right != nil {
+		return curr
+	}else if left != nil {
+		return left
+	} else {
+		return right
+	}
+}
+
+//找出最大值
+func (tree *BinaryTree)FindMaxBT() int {
+	return findMaxBT(tree.root)
+}
+func findMaxBT(curr *treeNode) int {
+	if curr == nil {
+		return math.MinInt64
+	}
+	max := curr.item.(int)
+	leftmax := findMaxBT(curr.left)
+	rightmax := findMaxBT(curr.right)
+	if leftmax > max {
+		max = leftmax
+	}
+	if rightmax > max {
+		max = rightmax
+	}
+	return max
+}
+
+//查找值
+func (tree *BinaryTree)SearchBT(searchValue int) bool {
+	return searchBT(tree.root,searchValue)
+}
+func searchBT(curr *treeNode,searchValue int) bool {
+	if curr == nil {
+		return false
+	}
+	if curr.item == searchValue {
+		return true
+	}
+	left := searchBT(curr.left,searchValue)
+	right := searchBT(curr.right,searchValue)
+	return left || right
+}
+
+//构造二叉查找树（arr需要有序）
+func CreateBinarySearchTree(arr []int) *BinaryTree {
+	tree := new(BinaryTree)
+	tree.root = createBinarySearchTree(arr,0,len(arr)-1)
+	return tree
+}
+
+func createBinarySearchTree(arr []int,start,end int) *treeNode {
+	if start > end {
+		return nil
+	}
+	mid := (start+end)/2
+	node := new(treeNode)
+	node.item = arr[mid]
+	node.left = createBinarySearchTree(arr,start,mid-1)
+	node.right = createBinarySearchTree(arr,mid+1,end)
+	return node
+}
+
+//二叉查找树的插入
+func (tree *BinaryTree)BSTadd(item int)  {
+	bstadd(tree.root,item)
+}
+func bstadd(curr *treeNode,item int) *treeNode{
+	if curr == nil {
+		curr = &treeNode{item:item}
+		return curr
+	}
+	if curr.item.(int) > item {
+		curr.left = bstadd(curr.left,item)
+	} else if curr.item.(int) < item {
+		curr.right = bstadd(curr.right,item)
+	}
+	return curr
+}
+
+//最大值
+func FindMax(t *treeNode) (interface{},bool) {
+	if t == nil {
+		return nil,false
+	}
+	for t.right != nil {
+		t = t.right
+	}
+	return t.item,true
+}
+//最小值
+func FindMin(t *treeNode) (interface{},bool) {
+	if t == nil {
+		return nil,false
+	}
+	for t.left != nil {
+		t = t.left
+	}
+	return t.item,true
+}
+
+//判断树是否是二叉查找树
+func (tree *BinaryTree)IsBST() bool {
+	return isBST(tree.root)
+}
+func isBST(curr *treeNode) bool {
+	if curr == nil {
+		return true
+	}
+	if curr.left != nil {
+		max,_ := FindMax(curr.left)
+		if max.(int) > curr.item.(int) {
+			return false
+		}
+	}
+	if curr.right != nil {
+		min,_ := FindMin(curr.right)
+		if min.(int) < curr.item.(int) {
+			return false
+		}
+	}
+	return isBST(curr.left) && isBST(curr.right)
 }

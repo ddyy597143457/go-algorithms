@@ -10,9 +10,8 @@ func LessIntFunc(c1,c2 interface{}) bool {
 }
 
 func main() {
-	arr := []int{4,5,6,7,8,9,10,11}
-	tree1 := tree.LevelOrderBinaryTree(arr)
-	tree1.PreOrder()
-	fmt.Println()
-	tree1.PrintAllPath()
+	arr := []int{1,2,3,4,5,6,7,8,9}
+	tree1 := tree.CreateBinarySearchTree(arr)
+	tree1.LevelTravel()
+	fmt.Println(tree1.IsBST())
 }
