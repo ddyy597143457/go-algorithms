@@ -1,21 +1,19 @@
 package main
 
 import (
-	"ddyy/go-algorithms/timer"
-	"time"
+	"ddyy/go-algorithms/tree"
 )
 
 func main() {
-	arr := make([]*timer.Pitem,0)
-	t := timer.NewPQueue(arr,true)
-	//now := time.Now()
-	day1 := time.Date(2019,12,03,23,23,55,0,time.Local)
-	t.Add(timer.NewPitem(day1,"睡觉"))
-	day2 := time.Date(2019,12,03,23,24,00,0,time.Local)
-	t.Add(timer.NewPitem(day2,"吃饭"))
-	day3 := time.Date(2019,12,03,23,37,30,0,time.Local)
-	t.Add(timer.NewPitem(day3,"看电影"))
-	day4 := time.Date(2019,12,03,23,41,10,0,time.Local)
-	t.Add(timer.NewPitem(day4,"累了"))
-	t.JobStart()
+	avl := tree.NewAvlTree()
+	avl.AvlAdd(100)
+	avl.AvlAdd(90)
+	avl.AvlAdd(8)
+	avl.AvlAdd(110)
+	avl.AvlAdd(120)
+	avl.AvlAdd(5)
+	avl.AvlAdd(4)
+	avl.LevelTravel()
+	avl.AvlAdd(99)
+	avl.LevelTravel()
 }
