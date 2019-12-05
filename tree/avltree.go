@@ -10,9 +10,9 @@ import (
 type Elem interface {}
 
 type AvlNode struct {
-	data Elem
+	item Elem
 	balance int
-	lchild,rchild *AvlNode
+	left,right *AvlNode
 }
 
 type AvlTree struct {
@@ -20,7 +20,7 @@ type AvlTree struct {
 }
 
 func NewAvlNode(value Elem) *AvlNode {
-	return &AvlNode{data:value}
+	return &AvlNode{item:value}
 }
 
 func NewAvlTree() *AvlTree {
@@ -36,11 +36,11 @@ func avlAdd(curr *AvlNode,value Elem) *AvlNode {
 		curr = NewAvlNode(value)
 		return curr
 	}
-	if less(value,curr.data) {
-		curr.lchild = avlAdd(curr.lchild,value)
+	if less(value,curr.item) {
+		curr.left = avlAdd(curr.left,value)
 		//如果失去平衡
-		if abs(heighet(curr.lchild)-heighet(curr.rchild)) > 1 {
-			if less(value,curr.lchild.data) {
+		if abs(heighet(curr.left)-heighet(curr.right)) > 1 {
+			if less(value,curr.left.item) {
 				//LL型，顺时针旋转
 				curr = left_left_ratation(curr)
 			} else {
@@ -49,10 +49,10 @@ func avlAdd(curr *AvlNode,value Elem) *AvlNode {
 			}
 		}
 	} else {
-		curr.rchild = avlAdd(curr.rchild,value)
+		curr.right = avlAdd(curr.right,value)
 		//如果失去平衡
-		if abs(heighet(curr.rchild)-heighet(curr.lchild)) > 1 {
-			if less(value,curr.rchild.data) {
+		if abs(heighet(curr.right)-heighet(curr.left)) > 1 {
+			if less(value,curr.right.item) {
 				//RL型
 				curr = right_left_ratation(curr)
 			} else {
@@ -65,40 +65,85 @@ func avlAdd(curr *AvlNode,value Elem) *AvlNode {
 	return curr
 }
 
+func (avl *AvlTree)AvlRemove(value Elem) {
+	avl.root = avlRemove(avl.root,value)
+}
+func avlRemove(curr *AvlNode,value Elem) *AvlNode {
+	if curr == nil {
+		return nil
+	}
+	if less(value,curr.item) {
+		//目标元素在左子树
+		curr.left = avlRemove(curr.left,value)
+		if abs(heighet(curr.left)-heighet(curr.right)) > 1 {
+			 //左子树删除了一个，如果失衡肯定是右子树长，属于RR型
+			 curr = right_right_ratation(curr)
+		}
+	} else if less(curr.item,value) {
+		//目标元素在右子树
+		curr.right = avlRemove(curr.right,value)
+		if abs(heighet(curr.left)-heighet(curr.right)) > 1 {
+			//右子树删除了一个，如果失衡肯定左右子树长，属于LL型
+			curr = left_left_ratation(curr)
+		}
+	} else {
+		//目标元素在此，删除
+		if curr.left == nil && curr.right == nil  {
+			//左右孩子都没有，直接返回nil
+			return nil
+		} else if curr.left == nil {
+			//左孩子为空，返回右孩子
+			return curr.right
+		} else if curr.right == nil {
+			//右孩子为空，返回左孩子
+			return curr.left
+		} else {
+			//左右孩子都非空
+			//从左子树选出一个最大的节点代替当前节点，然后删除那个最大节点
+			//或者从右子树选出一个最小的节点代替当前节点，然后删除那个最小节点
+			t,_  := AvlFindMin(curr.right)
+			curr.item = t
+			curr.right = avlRemove(curr.right,t.(int))
+		}
+	}
+	balance(curr)
+	return curr
+}
+
 //LL树型，顺时针旋转
 func left_left_ratation(curr *AvlNode) *AvlNode {
-	var lchild *AvlNode
-	lchild = curr.lchild
-	curr.lchild = lchild.rchild
-	lchild.rchild = curr
+	var left *AvlNode
+	left = curr.left
+	curr.left = left.right
+	left.right = curr
 	balance(curr)
-	balance(lchild)
-	return lchild
+	balance(left)
+	return left
 }
 //RR树型，逆时针旋转
 func right_right_ratation(curr *AvlNode) *AvlNode {
-	var rchild *AvlNode
-	rchild = curr.rchild
-	curr.rchild = rchild.lchild
-	rchild.lchild = curr
+	var right *AvlNode
+	right = curr.right
+	curr.right = right.left
+	right.left = curr
 	balance(curr)
-	balance(rchild)
-	return rchild
+	balance(right)
+	return right
 }
 //LR型，先逆时针旋再顺时针旋
 func left_right_ratation(curr *AvlNode) *AvlNode {
-	curr.lchild = right_right_ratation(curr.rchild)
+	curr.left = right_right_ratation(curr.right)
 	return left_left_ratation(curr)
 }
 //RL型，先顺时针旋再逆时针旋
 func right_left_ratation(curr *AvlNode) *AvlNode {
-	curr.rchild = left_left_ratation(curr.rchild)
+	curr.right = left_left_ratation(curr.right)
 	return right_right_ratation(curr)
 }
 
 func balance(a *AvlNode) {
 	if a != nil  {
-		a.balance = abs(heighet(a.lchild)-heighet(a.rchild))
+		a.balance = abs(heighet(a.left)-heighet(a.right))
 	}
 }
 
@@ -109,12 +154,33 @@ func max(x,y int) int {
 	return y
 }
 
+//最大值
+func AvlFindMax(t *AvlNode) (interface{},bool) {
+	if t == nil {
+		return nil,false
+	}
+	for t.right != nil {
+		t = t.right
+	}
+	return t.right,true
+}
+//最小值
+func AvlFindMin(t *AvlNode) (interface{},bool) {
+	if t == nil {
+		return nil,false
+	}
+	for t.left != nil {
+		t = t.left
+	}
+	return t.item,true
+}
+
 func heighet(curr *AvlNode) int {
 	if curr == nil {
 		return 0
 	}
-	lh := heighet(curr.lchild)
-	rh := heighet(curr.rchild)
+	lh := heighet(curr.left)
+	rh := heighet(curr.right)
 	if lh > rh {
 		return lh + 1
 	}
@@ -144,11 +210,11 @@ func (tree *AvlTree) LevelTravel() {
 	for !q.IsEmpty() {
 		it,_ := (q.DeQueue()).(*AvlNode)
 		fmt.Print(it," ")
-		if it.lchild != nil {
-			q.EnQueue(it.lchild)
+		if it.left != nil {
+			q.EnQueue(it.left)
 		}
-		if it.rchild != nil {
-			q.EnQueue(it.rchild)
+		if it.right != nil {
+			q.EnQueue(it.right)
 		}
 	}
 	fmt.Println()
