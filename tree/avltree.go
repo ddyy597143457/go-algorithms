@@ -130,12 +130,12 @@ func right_right_ratation(curr *AvlNode) *AvlNode {
 	balance(right)
 	return right
 }
-//LR型，先逆时针旋再顺时针旋
+//LR型，左子树先逆时针旋，curr再顺时针旋
 func left_right_ratation(curr *AvlNode) *AvlNode {
-	curr.left = right_right_ratation(curr.right)
+	curr.left = right_right_ratation(curr.left)
 	return left_left_ratation(curr)
 }
-//RL型，先顺时针旋再逆时针旋
+//RL型，右子树先顺时针旋，curr再逆时针旋
 func right_left_ratation(curr *AvlNode) *AvlNode {
 	curr.right = left_left_ratation(curr.right)
 	return right_right_ratation(curr)
